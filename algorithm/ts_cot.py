@@ -5,6 +5,8 @@ from utils import *
 from tqdm import tqdm
 import torch.nn as nn
 from models.info_nce import *
+
+from dataloader import TwoViewloader
 def generate_binomial_mask(target_matrix, p=0.5, seed_=42):
     # np.random.seed(seed_)
     return torch.from_numpy(np.random.binomial(1, p, size=(target_matrix.shape)))
@@ -220,31 +222,12 @@ class TS_CoT(nn.Module):
                 sample_fre = sample_fre.to(self.device)
                 tem_feat_1, tem_feat_2, tem_feat_3, tem_z = self.tem_encoder(sample_tem.float(), 1)
                 tem_feat_1_m, tem_feat_2_m, tem_feat_3_m, tem_z_m = self.tem_encoder(sample_tem.float(), self.args.dropmask, self.args.seed)
-                # print("tem_feat_3 shape",tem_feat_3.shape)
-                # print("tem_feat_3_m shape",tem_feat_3_m.shape)
-                
-                # temp_cont_loss1, temp_cont_feat1 = self.tc(tem_feat_3,tem_feat_3_m)
-                # temp_cont_loss2, temp_cont_feat2 = self.tc(tem_feat_3_m,tem_feat_3)
-
-                
-                # print("temp_cont_feat1 shape",temp_cont_feat1.shape)
-                # print("temp_cont_feat2 shape",temp_cont_feat2.shape)
-                # temp_cont_feat1 = F.normalize(temp_cont_feat1, dim=1)
-                # temp_cont_feat2 = F.normalize(temp_cont_feat2, dim=1)
-                # temp_loss = nt_xent_criterion(temp_cont_feat1, temp_cont_feat2)
+   
                 
                 fre_feat_1, fre_feat_2, fre_feat_3, fre_z = self.fre_encoder(sample_fre.float(), 1)
                 fre_feat_1_m, fre_feat_2_m, fre_feat_3_m, fre_z_m = self.fre_encoder(sample_fre.float(), self.args.dropmask, self.args.seed)
                 # tem_z = self.mamba_tem(tem_z)
-                # tem_z_m = self.mamba_tem(tem_z_m)
-                # fre_z = self.mamba_fre(fre_z)
-                # fre_z_m = self.mamba_tem(fre_z_m)
-                # temp_cont_feat1 = F.normalize(temp_cont_feat1, dim=1)
-                # temp_cont_feat2 = F.normalize(temp_cont_feat2, dim=1)
-                # fre_cont_loss1, fre_cont_feat1 = self.tc(fre_feat_3,fre_feat_3_m)
-                # fre_cont_loss2, fre_cont_feat2 = self.tc(fre_feat_3_m,fre_feat_3)
-                # fre_loss = nt_xent_criterion(fre_cont_feat1, fre_cont_feat2)
-                # print(tem_z.squeeze(-1).shape,tem_z_m.squeeze(-1).shape)
+
                 criterion = InfoNCE(self.args.temperature)
                 loss_tem_nce = criterion(tem_z.squeeze(-1), tem_z_m.squeeze(-1))
                 batch_loss_tem_nce.append(loss_tem_nce.item())
@@ -313,9 +296,11 @@ class TS_CoT(nn.Module):
 
 
     def save(self, fn):
+        
         torch.save({'TemEncoder': self.tem_encoder.state_dict(), 'FreEncoder': self.fre_encoder.state_dict()}, fn)
     
     def load(self,fn):
+        
         # state_dict = torch.load(fn, map_location=self.device)
         self.tem_encoder.load_state_dict(torch.load(fn,map_location=self.device)['TemEncoder'])
         self.fre_encoder.load_state_dict(torch.load(fn, map_location=self.device)['FreEncoder'])

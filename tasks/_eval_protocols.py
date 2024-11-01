@@ -8,6 +8,8 @@ import numpy as np
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import IsolationForest
+from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import GridSearchCV, train_test_split
@@ -37,9 +39,20 @@ pipe_knn = make_pipeline(
         KNeighborsClassifier(n_neighbors=1)
     )
 
+pipe_if = make_pipeline(
+        StandardScaler(),
+        IsolationForest(contamination='auto')
+    )
+
+pipe_kmeans = make_pipeline(
+        StandardScaler(),
+        KMeans(n_clusters=2)
+    )
+
 def fit_mlp(features, y, test_features, test_y):
 
     samples_num = features.shape[0]
+    print(features.shape,y.shape)
     torch_dataset_train = Data.TensorDataset(torch.tensor(features), torch.tensor(y))
     # torch_dataset_val = Data.TensorDataset(torch.tensor(features), torch.tensor(y))
     torch_dataset_test = Data.TensorDataset(torch.tensor(test_features), torch.tensor(test_y))
@@ -59,7 +72,6 @@ def fit_mlp(features, y, test_features, test_y):
         batch_size=256,
         shuffle=False,
     )
-
     mlp_model = Linear_probe(features.shape[1], int(y.max()+1))
     optimizer = torch.optim.Adam(mlp_model.parameters(), lr=0.001, betas=(0.9, 0.99), weight_decay=1e-4)
     loss_func = torch.nn.CrossEntropyLoss()
@@ -71,7 +83,7 @@ def fit_mlp(features, y, test_features, test_y):
     recall_epoch = []
     precision_epoch = []
     auprc_epoch = []
-    for epoch in tqdm(range(100)):
+    for epoch in tqdm(range(5)):
         train_loss = []
         val_loss = []
         for step, (batch_x, batch_y) in enumerate(loader_train):
@@ -199,3 +211,8 @@ def fit_knn(features, y):
     
     pipe_knn.fit(features, y)
     return pipe_knn
+
+def fit_if(features, y):
+    
+    pipe_if.fit(features)
+    return pipe_if

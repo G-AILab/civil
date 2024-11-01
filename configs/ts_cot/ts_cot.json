@@ -1,5 +1,6 @@
 {
     "dataset": "HAR",
+    "dataset_root": "/workspace/CA-TCC/data",
     "gpu": 0,
     "dataloader": "HAR",
     "max_threads": 8,

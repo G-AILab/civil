@@ -7,6 +7,7 @@ from datetime import datetime
 from algorithm.ts_sea import TS_SEA
 from algorithm.ts_cot import TS_CoT
 from algorithm.ts2vec import TS2Vec
+from algorithm.ts2tcc import TS_TCC
 import tasks
 import datautils
 from utils import init_cuda, get_logger
@@ -27,10 +28,6 @@ def set_seed(seed):
 
 
 def eval_mlp(device,logger,args):
-    logger.info("="*100)
-    logger.info("label ratio :"+args.data_perc)
-    logger.info("="*100)
-
 
     model,train_data,train_labels, test_data, test_labels = build_model(device=device,args=args)
     
@@ -57,9 +54,6 @@ def init_agrs(args):
     if args.dataloader is None :
         args.dataloader = args.dataset
     
-   
-
-    args.model_path = f'{args.run_dir}/model.pkl'
     
     if args.eval:
         args.epochs = 0
@@ -76,7 +70,7 @@ def build_model(device,args):
     if args.backbone_type =="TS_CoT":
 
 
-        train_data, train_labels, test_data, test_labels = datautils.get_idata_loader(args)
+        train_data, train_labels, test_data, test_labels = datautils.load_itwo_view(args)
         args.in_dims = train_data[0].shape[-1]
         model = TS_CoT(
                     input_dims=train_data[0].shape[-1],
@@ -87,7 +81,7 @@ def build_model(device,args):
     elif args.backbone_type =="TS_SEA":
 
         # print(type(args.data_perc),2)
-        train_data, train_labels, test_data, test_labels = datautils.get_data_loader(args)
+        train_data, train_labels, test_data, test_labels = datautils.load_itri_view(args)
 
         args.in_dims = train_data[0].shape[-1]
         model = TS_SEA(
@@ -112,6 +106,16 @@ def build_model(device,args):
             device=device,
             **config
         )
+    elif args.backbone_type =="TS_TCC":
+
+        train_data, train_labels, test_data, test_labels = datautils.get_ts2vec_loader(args)
+
+
+        args.in_dims = args.input_channels
+        model = TS_TCC(
+            device=device,
+            args=args
+        )
     else :
         raise Exception("Unknown Backbone")
     
@@ -134,10 +138,6 @@ def train_model(config_path="configs/ts_cot.json"):
     
     logger.info('Loading data... ')
 
-
-    model,train_data,_,_,_ = build_model(device=device,args=args)
-        
-
     logger.info(f"Backbone is {args.backbone_type}")
     
     ##############################################################################
@@ -145,11 +145,15 @@ def train_model(config_path="configs/ts_cot.json"):
     ##############################################################################
 
     if not args.eval:
+        model,train_data,_,_,_ = build_model(device=device,args=args)
         
         model.fit_ts_cot(
             train_data,
-            n_epochs=args.epochs,logger=logger
+            n_epochs=args.epochs
+            ,logger=logger
         )
+
+        args.model_path = f'{args.run_dir}/model.pkl'
         model.save(args.model_path)
         
         args.eval = True 
@@ -165,10 +169,7 @@ def train_model(config_path="configs/ts_cot.json"):
     logger.info(args.eval)
     
     if args.eval:
-        ft_modes=[args.data_perc]
-        for ft_mode in ft_modes:
-            # args.data_perc = ft_mode
-            eval_mlp(device=device,logger=logger,args=args)
+        eval_mlp(device=device,logger=logger,args=args)
     config_to_json(args,f'{args.run_dir}/config.json')
     
     logger.info(os.path.basename(__file__))
@@ -177,6 +178,7 @@ def train_model(config_path="configs/ts_cot.json"):
 
 if __name__ == '__main__':
     # train_model("/workspace/Civil/configs/ts_cot/ts_cot_4_epi.json")
-    # train_model("configs/ts_sea/ts_sea.json")
+    # train_model("configs/ts_sea/ts_sea_4_har.json")
     # train_model("configs/ts2vec/ts2vec_4_har.json")
-    train_model("configs/ts_cot/ts_cot_4_har.json")
+    # train_model("configs/ts_cot/ts_cot_4_har.json")
+    train_model("configs/ts2tcc/ts2tcc_4_har.json")

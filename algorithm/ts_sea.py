@@ -4,7 +4,7 @@ from utils import *
 from tqdm import tqdm
 import torch.nn as nn
 from models.info_nce import InfoNCE
-
+from dataloader import ThreeViewloader
 def generate_binomial_mask(target_matrix, p=0.5, seed_=42):
     # np.random.seed(seed_)
     return torch.from_numpy(np.random.binomial(1, p, size=(target_matrix.shape)))
