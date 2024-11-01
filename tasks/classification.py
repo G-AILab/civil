@@ -26,9 +26,9 @@ def eval_classification(model, train_data, train_labels, test_data
         repr_results['test_repr'] = test_repr
         repr_results['train_labels'] = train_labels
         repr_results['test_labels'] = test_labels
-        
+        args.feat_dim = train_repr.shape[1]
         mlp_model,y_score, metricss = eval_protocols.fit_mlp(train_repr, train_labels, test_repr, test_labels)
-        torch.save({'mlp_model': mlp_model}, f'{args.run_dir}/model_{eval_protocol}.pkl')
+        torch.save({'mlp_model': mlp_model.state_dict()}, f'{args.run_dir}/model_{eval_protocol}.pkl')
         return y_score, metricss
     
     elif eval_protocol == 'linear':

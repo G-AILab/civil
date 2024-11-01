@@ -519,16 +519,17 @@ class TS_SEA(nn.Module):
         return output.cpu().numpy()
 
     def encode_online(self,data):
+        with torch.no_grad():
 
-        sample_tem = data[0].to(self.device)
-        sample_fre = data[0].to(self.device)
-        sample_sea = data[0].to(self.device)
+            sample_tem = torch.from_numpy(data[0]).to(torch.float).to(self.device)
+            sample_fre = torch.from_numpy(data[1]).to(torch.float).to(self.device)
+            sample_sea = torch.from_numpy(data[2]).to(torch.float).to(self.device)
 
-        _, _, _, tem_z = self.tem_encoder(sample_tem.float())
-        _, _, _, fre_z = self.fre_encoder(sample_fre.float())
-        _, _, _, sea_z = self.sea_encoder(sample_sea.float())
-        out = torch.cat((tem_z.squeeze(-1), fre_z.squeeze(-1),sea_z.squeeze(-1)), dim=1)
-        return out.cpu().numpy()
+            _, _, _, tem_z = self.tem_encoder(sample_tem.float())
+            _, _, _, fre_z = self.fre_encoder(sample_fre.float())
+            _, _, _, sea_z = self.sea_encoder(sample_sea.float())
+            out = torch.cat((tem_z.squeeze(-1), fre_z.squeeze(-1),sea_z.squeeze(-1)), dim=1)
+            return out.cpu().numpy()
 
     def save(self, fn):
         print(fn)
