@@ -1,0 +1,111 @@
+{
+    "dataset": {
+        "type": "str",
+        "required": true,
+        "help": "The experimental dataset to be used: HAR, Epi, SleepEDF, Waveform."
+    },
+    "gpu": {
+        "type": "int",
+        "default": 0,
+        "help": "The experimental GPU index."
+    },
+    "dataloader": {
+        "type": "str",
+        "default": null,
+        "help": "data loader"
+    },
+    "max_threads": {
+        "type": "int",
+        "default": 8,
+        "help": "The maximum threads"
+    },
+    "batch_size": {
+        "type": "int",
+        "default": 32,
+        "help": "Batch size"
+    },
+    "lr": {
+        "type": "float",
+        "default": 0.001,
+        "help": "Learning rate"
+    },
+    "repr_dims": {
+        "type": "int",
+        "default": 32,
+        "help": "Dimension of Representation"
+    },
+    "epochs": {
+        "type": "int",
+        "default": null,
+        "help": "The number of epochs to be trained"
+    },
+    "seed": {
+        "type": "int",
+        "default": 1024,
+        "help": "The random seed to be fixed"
+    },
+    "eval": {
+        "action": "store_true",
+        "help": "Set true for evaluation"
+    },
+    "num_cluster": {
+        "default": "5",
+        "type": "str",
+        "help": "number of clusters"
+    },
+    "temperature": {
+        "default": 0.1,
+        "type": "float",
+        "help": "softmax temperature of InfoNCE"
+    },
+    "warmup": {
+        "default": 0.5,
+        "type": "float",
+        "help": "Warmup epoch before using co-training"
+    },
+    "prototype_lambda": {
+        "default": 0.1,
+        "type": "float",
+        "help": "Prototypical loss scale adjustment"
+    },
+    "eval_protocol": {
+        "default": "mlp",
+        "type": "str",
+        "help": "Classification backbone for downstreaming tasks."
+    },
+    "backbone_type": {
+        "default": "TS_SEA",
+        "type": "str",
+        "help": "Which backone to use for representation learning."
+    },
+    "dropmask": {
+        "default": 0.9,
+        "type": "float",
+        "help": "Masking ratio for augmentation"
+    },
+    "model_path": {
+        "default": null,
+        "type": "str",
+        "help": "The path of the model to be loaded"
+    },
+    "ma_gamma": {
+        "default": 0.9999,
+        "type": "float",
+        "help": "The moving average parameter for prototype updating"
+    },
+    "run_desc": {
+        "default": "exp_run",
+        "type": "str",
+        "help": "The moving average parameter for prototype updating"
+    },
+    "data_perc": {
+        "default": "train",
+        "type": "str",
+        "help": "The moving average parameter for prototype updating"
+    },
+    "decomp_mode": {
+        "default": "seasonal",
+        "type": "str",
+        "help": "The moving average parameter for prototype updating"
+    }
+}

@@ -1,0 +1,11 @@
+/datasets/*[!.py]
+data/
+.ipynb_checkpoints
+__pycache__
+training/*
+scripts/_nohup
+.rsync-filter
+*.log
+*.out
+*.pkl
+/exp_logs/*

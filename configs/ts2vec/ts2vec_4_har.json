@@ -1,0 +1,23 @@
+{
+    "dataset": "HAR",
+    "run_desc": "civil_bi",
+    "dataloader": "HAR",
+    "gpu": 1,
+    "batch_size": 256,
+    "lr": 0.001,
+    "in_dims": 9,
+    "repr_dims": 320,
+    "max_train_length": 3000,
+    "iters": null,
+    "epochs": 2,
+    "save_every": null,
+    "seed": null,
+    "max_threads": null,
+    "eval": false,
+    "irregular": 0,
+    "data_perc": "train",
+    "model_path": null,
+    "eval_protocol": "linear",
+    "backbone_type": "TS2Vec",
+    "num_cluster": [6]
+}
