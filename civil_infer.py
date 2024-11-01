@@ -37,7 +37,8 @@ MODEL_CACHE = {
 
 MODEL_INFO_TMP = {
     '20241101_045329':'exp_logs/civil_bi/HAR/TS2Vec/20241101_045329/config.json',
-    '20241101_051903':'exp_logs/civil_bi/HAR/TS2Vec/20241101_051903/config.json'
+    '20241101_051903':'exp_logs/civil_bi/HAR/TS2Vec/20241101_051903/config.json',
+    '20241101_070207':'exp_logs/civil/HAR/TS_CoT/20241101_070207/config.json'
 }
 
 def build_model(device,args,):
@@ -110,6 +111,7 @@ def inference(model_id,data):
 
     
     if args.eval_protocol == 'mlp':
+        data_repr = torch.from_numpy(data_repr)
         test_pred = task_proto(data_repr)
         test_pred = torch.functional.F.softmax(test_pred, dim=1)
         y_score = torch.argmax(test_pred, dim=1)
@@ -133,8 +135,10 @@ def infer_model(config_path="configs/ts_cot.json"):
 
     
     if args.eval_protocol == 'mlp':
-        task_proto = eval_protocols.Linear_probe(args.in_dims,args.num_cluster)
-        task_proto.load_state_dict(torch.load(f'{args.model_path}/{args.eval_protocol}.pkl',map_location=args.device))
+        args.num_cluster = args.num_cluster[0]
+        task_proto = eval_protocols.Linear_probe(args.feat_dim,args.num_cluster)
+        # task_proto.load_state_dict(torch.load(f'{args.model_path}/{args.eval_protocol}.pkl',map_location=args.device))
+        task_proto.load_state_dict(torch.load(f'{args.run_dir}/model_{args.eval_protocol}.pkl')['mlp_model'])
     else:
         #fit_clf = EVAL_PROTO[eval_protocol] #  eval_protocols.fit_knn
         task_proto = joblib.load(f'{args.run_dir}/{args.eval_protocol}.joblib')
@@ -166,5 +170,5 @@ if __name__ == '__main__':
     for idx in range(0,len(train_['samples']),100):
         print(idx)
         data = train_['samples'][idx:idx+100]
-        y_score,y_label = inference("20241101_045329",data)
+        y_score,y_label = inference("20241101_070207",data)
         print(y_label)

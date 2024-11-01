@@ -67,7 +67,7 @@ def init_agrs(args):
     return args 
 
 
-def build_model(device,args,):
+def build_model(device,args):
     
     ##############################################################################
     ###### 加载模型骨架
@@ -77,7 +77,7 @@ def build_model(device,args,):
 
 
         train_data, train_labels, test_data, test_labels = datautils.get_idata_loader(args)
-        
+        args.in_dims = train_data[0].shape[-1]
         model = TS_CoT(
                     input_dims=train_data[0].shape[-1],
                     output_dims=args.repr_dims,
@@ -89,7 +89,7 @@ def build_model(device,args,):
         # print(type(args.data_perc),2)
         train_data, train_labels, test_data, test_labels = datautils.get_data_loader(args)
 
-
+        args.in_dims = train_data[0].shape[-1]
         model = TS_SEA(
                     input_dims=train_data[0].shape[-1],
                     output_dims=args.repr_dims,
@@ -106,6 +106,7 @@ def build_model(device,args,):
             output_dims=args.repr_dims,
             max_train_length=args.max_train_length
         )
+        args.in_dims = train_data.shape[-1]
         model = TS2Vec(
             input_dims=train_data.shape[-1],
             device=device,
@@ -177,4 +178,5 @@ def train_model(config_path="configs/ts_cot.json"):
 if __name__ == '__main__':
     # train_model("/workspace/Civil/configs/ts_cot/ts_cot_4_epi.json")
     # train_model("configs/ts_sea/ts_sea.json")
-    train_model("configs/ts2vec/ts2vec_4_har.json")
+    # train_model("configs/ts2vec/ts2vec_4_har.json")
+    train_model("configs/ts_cot/ts_cot_4_har.json")
