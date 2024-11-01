@@ -71,50 +71,6 @@ def init_cuda(
     return devices if len(devices) > 1 else devices[0]
 
 
-class TwoViewloader(Dataset):
-    """
-    Return the dataitem and corresponding index
-    The batch of the loader: A list
-        - [B, L, 1] (For univariate time series)
-        - [B]: The corresponding index in the train_set tensors
-
-    """
-    def __init__(self, data):
-        self.data = data
-
-    def __getitem__(self, index):
-        sample_tem = self.data[0][index]
-        sample_fre = self.data[1][index]
-
-
-        return index, sample_tem, sample_fre
-
-    def __len__(self):
-        return len(self.data[0])
-
-
-
-class ThreeViewloader(Dataset):
-    """
-    Return the dataitem and corresponding index
-    The batch of the loader: A list
-        - [B, L, 1] (For univariate time series)
-        - [B]: The corresponding index in the train_set tensors
-
-    """
-    def __init__(self, data):
-        self.data = data
-
-    def __getitem__(self, index):
-        sample_tem = self.data[0][index]
-        sample_fre = self.data[1][index]
-        sample_sea = self.data[2][index]
-
-
-        return index, sample_tem, sample_fre,sample_sea
-
-    def __len__(self):
-        return len(self.data[0])
 
 def run_kmeans(x, args, last_clusters = None):
     results = {'im2cluster': [], 'centroids': [], 'density': [], 'distance': [], 'distance_2_center': []}

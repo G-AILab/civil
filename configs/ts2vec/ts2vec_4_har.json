@@ -1,5 +1,6 @@
 {
     "dataset": "HAR",
+    "dataset_root": "/workspace/CA-TCC/data",
     "run_desc": "civil_bi",
     "dataloader": "HAR",
     "gpu": 1,

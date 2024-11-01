@@ -2,7 +2,7 @@ import numpy as np
 from . import _eval_protocols as eval_protocols
 from utils import *
 import datautils
-from sklearn.metrics import average_precision_score,f1_score,classification_report,roc_auc_score
+from sklearn.metrics import average_precision_score,f1_score,classification_report,roc_auc_score,accuracy_score
 import joblib
 # from . import _visualization as t_sne_visual
 def merge_dim01(array):
@@ -35,6 +35,8 @@ def eval_classification(model, train_data, train_labels, test_data
         fit_clf = eval_protocols.fit_lr
     elif eval_protocol == 'svm':
         fit_clf = eval_protocols.fit_svm
+    elif eval_protocol == 'if':
+        fit_clf = eval_protocols.fit_if
     elif eval_protocol == 'knn':
         fit_clf = eval_protocols.fit_knn
     else:
@@ -51,14 +53,24 @@ def eval_classification(model, train_data, train_labels, test_data
 
         joblib.dump(clf, f'{args.run_dir}/{eval_protocol}.joblib')
 
-    acc = clf.score(test_repr, test_labels)
-
-
+    
 
     if eval_protocol in ['linear','knn'] :
         y_score = clf.predict_proba(test_repr)
+        acc = clf.score(test_repr, test_labels)
+    elif eval_protocol in ['if']:
+
+
+        y_pred = clf.predict(test_repr)
+        print(y_pred)
+        # y_pred = np.where(y_pred == -1, 1, 0)
+        print(y_pred,test_labels)
+        accuracy = accuracy_score(test_labels,y_pred)
+
+        return y_pred,{'acc':accuracy}
     else:
         y_score = clf.score(test_repr)
+        acc = clf.score(test_repr, test_labels)
  
 
     if int(test_labels.max()+1) >2:

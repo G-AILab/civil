@@ -94,12 +94,16 @@ def compute_seasonal(dataset,train_X,test_X):
 
     return train_X_sea,test_X_sea
 
-def load_itri_view(mode="train",dataset="ISRUC",decompose_mode=None):
-    # train_X, train_y, test_X, test_y = load_HAR()
-    # train_X_fft, _, test_X_fft, _ = load_HAR_fft()
-    # train_X_sea, _, test_X_sea, _ = load_HAR_seasonal()
+def load_itri_view(args):
+    
+    mode = args.data_perc
+
+    dataset=args.dataset
+
+    decompose_mode=args.decomp_mode
+
     print(mode)
-    data_path = f"/workspace/CA-TCC/data/{dataset}/"
+    data_path = f"{args.dataset_root}/{dataset}/"
     print(data_path)
     if mode!="train":
         train_ = torch.load(data_path + f"train_{mode}.pt")
@@ -188,12 +192,12 @@ def load_itri_view(mode="train",dataset="ISRUC",decompose_mode=None):
     return [train_X, train_X_fft,train_X_sea], train_y, [test_X, test_X_fft,test_X_sea], test_y
 
 
-def load_itwo_view(mode="train",dataset="ISRUC"):
-    # train_X, train_y, test_X, test_y = load_HAR()
-    # train_X_fft, _, test_X_fft, _ = load_HAR_fft()
-    # train_X_sea, _, test_X_sea, _ = load_HAR_seasonal()
+def load_itwo_view(args):
+    mode = args.data_perc
+    dataset = args.dataset
+
     print(mode)
-    data_path = f"/workspace/CA-TCC/data/{dataset}/"
+    data_path = f"{args.dataset_root}/{dataset}/"
     print(data_path)
     if mode!="train":
         train_ = torch.load(data_path + f"train_{mode}.pt")
@@ -453,28 +457,6 @@ def load_uea_two_view(mode="train",_type="UEA",dataset="SelfRegulationSCP1"):
 
 
 
-def get_data_loader(args):
-    if args.dataloader in ["general_cls",'FordA','Bridge','ECG','SleepEDF','Gesture','EMG','SleepEEG','FD-A','FD-B']:
-        train_data, train_labels, test_data, test_labels = load_itri_view(args.data_perc,args.dataset,args.decomp_mode)
-
-    if args.dataloader == 'RoadBank' or args.dataloader == "Bridge":
-        train_data, train_labels, test_data, test_labels = load_roadbank_two_view(args.data_perc,args.dataset)
-    
-    if args.dataloader == 'UEA':
-        train_data, train_labels, test_data, test_labels = load_uea_two_view(args.data_perc,"UEA",args.dataset)
-    
-    if args.dataloader == 'UCR':
-        train_data, train_labels, test_data, test_labels = load_uea_two_view(args.data_perc,"UCR",args.dataset)
-    
-    return train_data, train_labels, test_data, test_labels
-
-
-def get_idata_loader(args):
-    # if args.dataloader in ["HAR","Epilepsy","ISRUC",'FordA','Bridge','ECG','SleepEDF','Gesture']:
-    train_data, train_labels, test_data, test_labels = load_itwo_view(args.data_perc,args.dataset)
-    
-    return train_data, train_labels, test_data, test_labels
-
 
 
 def get_ts2vec_loader(args):
@@ -527,3 +509,45 @@ def get_ts2vec_loader(args):
     return train_X, train_y, test_X, test_y
  
 
+def get_ts2tcc_loader(configs):
+    import os
+    import dataloader
+    batch_size = configs.batch_size
+    training_mode = configs.data_perc
+    data_path = f"{configs.dataset_root}/{configs.dataset}"
+    print(data_path,training_mode)
+    if "_1p" in training_mode:
+        train_dataset = torch.load(os.path.join(data_path, "train_1perc.pt"))
+    elif "_5p" in training_mode:
+        train_dataset = torch.load(os.path.join(data_path, "train_5perc.pt"))
+    elif "_10p" in training_mode:
+        train_dataset = torch.load(os.path.join(data_path, "train_10perc.pt"))
+    elif "_50p" in training_mode:
+        train_dataset = torch.load(os.path.join(data_path, "train_50perc.pt"))
+    elif "_75p" in training_mode:
+        train_dataset = torch.load(os.path.join(data_path, "train_75perc.pt"))
+    elif training_mode == "SupCon":
+        train_dataset = torch.load(os.path.join(data_path, "pseudo_train_data.pt"))
+    else:
+        train_dataset = torch.load(os.path.join(data_path, "train.pt"))
+
+    # valid_dataset = torch.load(os.path.join(data_path, "val.pt"))
+    test_dataset = torch.load(os.path.join(data_path, "test.pt"))
+
+    return train_dataset["samples"],train_dataset["labels"],test_dataset["samples"],train_dataset["labels"]
+    # train_dataset = Load_Dataset(train_dataset, configs, training_mode)
+    # valid_dataset = Load_Dataset(valid_dataset, configs, training_mode)
+    # test_dataset = Load_Dataset(test_dataset, configs, training_mode)
+
+    # if train_dataset.__len__() < batch_size:
+    #     batch_size = 16
+
+    # train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size,
+    #                                            shuffle=True, drop_last=True, num_workers=0)
+    # valid_loader = torch.utils.data.DataLoader(dataset=valid_dataset, batch_size=batch_size,
+    #                                            shuffle=False, drop_last=True, num_workers=0)
+
+    # test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size,
+    #                                           shuffle=False, drop_last=False, num_workers=0)
+
+    # return train_loader, valid_loader, test_loader

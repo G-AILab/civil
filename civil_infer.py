@@ -24,6 +24,7 @@ TRANS_DATA_DICT = {
 EVAL_PROTO = {
     'linear' : eval_protocols.pipe_lr,
     'svm' : eval_protocols.pipe_knn,
+    'if' : eval_protocols.pipe_if,
     'knn' : eval_protocols.pipe_knn,
     'mlp' : eval_protocols.Linear_probe
 }
