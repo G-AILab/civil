@@ -1,0 +1,63 @@
+version: '3.3'
+
+services:
+  torchserve:
+    image: pytorch/torchserve:0.12.0-gpu
+    container_name: torchserve
+    hostname: ano-infer
+    ports:
+      - "19080:8080"  # REST API
+      - "19081:8081"  # Management API
+      - "19082:8082"  
+    volumes:
+      - ./model_store:/home/model-server/model-store
+      - ./config:/home/model-server/config
+    command: >
+      torchserve --start
+                 --model-store /home/model-server/model-store
+                 --ts-config /home/model-server/config/config.properties
+
+--------------
+
+version: '3.8'
+
+services:
+  torchserve:
+    image: civil-torchserve:0.25
+    container_name: civil-infer
+    hostname: civil-infer
+    ports:
+      - "19012:22"  # ssh
+      - "19080:8080"  # REST API
+      - "19081:8081"  # Management API
+      - "19082:8082"  
+    volumes:
+      - ./model_store:/workspace/model-server/model-store
+      - ./config/config.properties:/workspace/model-server/config.properties
+    command: >
+      torchserve --start
+                 --model-store /workspace/model-server/model-store
+                 --ts-config /workspace/model-server/config.properties
+
+
+version: '3.3'
+
+services:
+  torchserve:
+    image: civil-torchserve:0.25
+    container_name: civil-infer
+    hostname: civil-infer
+    ports:
+      - "19012:22"       # SSH
+      - "19080:8080"     # REST API
+      - "19081:8081"     # Management API
+      - "19082:8082"
+    volumes:
+      - ./model_store:/workspace/model-server/model-store
+      - ./Civil:/workspace/Civil
+      - ./config/config.properties:/workspace/model-server/config.properties
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]

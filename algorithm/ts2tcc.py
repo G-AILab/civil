@@ -29,14 +29,10 @@ class TS_TCC(nn.Module):
     def fit_ts_cot(self, train_loader,n_epochs=None,logger=None):
         total_loss = []
 
-        self.model.train()
-        self.temporal_contr_model.train()
+        model_optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.lr)
 
-        model_optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.lr, betas=(self.args.beta1, self.args.beta2),
-                                    weight_decay=3e-4)
+        temporal_contr_optimizer = torch.optim.Adam(self.temporal_contr_model.parameters(), lr=self.args.lr)
 
-        temporal_contr_optimizer = torch.optim.Adam(self.temporal_contr_model.parameters(), lr=self.args.lr,
-                                                betas=(self.args.beta1, self.args.beta2), weight_decay=3e-4)
         train_loader = Load_Dataset(train_loader, self.args)
         train_loader = DataLoader(dataset=train_loader, batch_size=self.args.batch_size,
                                            shuffle=True, drop_last=True, num_workers=0)
@@ -101,7 +97,6 @@ class TS_TCC(nn.Module):
                 data = data.float().to(self.device)
                 # aug1, aug2 = aug1.float().to(self.device), aug2.float().to(self.device)
                 feat = self.model(data)
-                print(feat.shape)
                 feat = feat.reshape(feat.shape[0], -1)
                 output.append(feat)
             

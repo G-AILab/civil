@@ -8,6 +8,7 @@ from algorithm.ts_sea import TS_SEA
 from algorithm.ts_cot import TS_CoT
 from algorithm.ts2vec import TS2Vec
 from algorithm.ts2tcc import TS_TCC
+from algorithm.ts2dual import TS2Dual
 import tasks
 import datautils
 from utils import init_cuda, get_logger
@@ -106,6 +107,23 @@ def build_model(device,args):
             device=device,
             **config
         )
+    elif args.backbone_type =="TS2Dual":
+
+        train_data, train_labels, test_data, test_labels = datautils.load_itwo_view(args)
+
+        config = dict(
+            batch_size=args.batch_size,
+            lr=args.lr,
+            output_dims=args.repr_dims,
+            max_train_length=args.max_train_length,
+            args=args
+        )
+        args.in_dims = train_data[0].shape[-1]
+        model = TS2Dual(
+            input_dims=train_data[0].shape[-1],
+            device=device,
+            **config
+        )
     elif args.backbone_type =="TS_TCC":
 
         train_data, train_labels, test_data, test_labels = datautils.get_ts2vec_loader(args)
@@ -181,4 +199,4 @@ if __name__ == '__main__':
     # train_model("configs/ts_sea/ts_sea_4_har.json")
     # train_model("configs/ts2vec/ts2vec_4_har.json")
     # train_model("configs/ts_cot/ts_cot_4_har.json")
-    train_model("configs/ts2tcc/ts2tcc_4_har.json")
+    train_model("configs/ts2vec/ts2dual_4_bridge.json")

@@ -1,0 +1,33 @@
+{
+    "dataset": "HAR",
+    "dataset_root": "/workspace/CA-TCC/data",
+    "run_desc": "civil_bi",
+    "dataloader": "HAR",
+    "gpu": 1,
+    "batch_size": 256,
+    "lr": 0.001,
+    "in_dims": 9,
+    "repr_dims": 320,
+    "max_train_length": 3000,
+    "iters": null,
+    "epochs": 2,
+    "save_every": null,
+    "seed": null,
+    "max_threads": null,
+    "eval": false,
+    "irregular": 0,
+    "temperature": 0.1,
+    "warmup": 0.5,
+    "ma_gamma": 0.9999,
+    "ma_alpha": 0.01,
+    "ma_beta": 0.01,
+    "dropmask": 0.9,
+    "prototype_lambda": 0.1,
+    "data_perc": "train",
+    "model_path": null,
+    "eval_protocol": "linear",
+    "backbone_type": "TS2Dual",
+    "num_cluster": [
+        6
+    ]
+}

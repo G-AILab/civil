@@ -9,3 +9,6 @@ scripts/_nohup
 *.out
 *.pkl
 /exp_logs/*
+model-store/
+logs/
+configs/*.json
